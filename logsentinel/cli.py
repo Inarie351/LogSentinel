@@ -5,6 +5,7 @@ import sys
 from datetime import datetime
 
 from .analyzer import aggregate_by_ip, build_recommendations, build_summary
+from .blocker import block_ip
 from .parser import parse_log_file
 
 WIDTH = 40
@@ -135,6 +136,13 @@ def main():
     parser_args.add_argument(
         "--output-dir", default=".", help="Dossier de sortie pour les rapports (défaut: dossier courant)"
     )
+    parser_args.add_argument(
+        "--block",
+        nargs="+",
+        metavar="IP",
+        dest="block_ips",
+        help="Bloque les IPs indiquées via iptables (nécessite les privilèges root)",
+    )
 
     args = parser_args.parse_args()
 
@@ -156,6 +164,12 @@ def main():
     if args.markdown:
         path = export_markdown(summary, stats, recommendations, args.output_dir)
         print(f"Rapport Markdown généré : {path}")
+
+    if args.block_ips:
+        print_header("BLOCAGE D'IPS")
+        for ip in args.block_ips:
+            success, message = block_ip(ip)
+            print(("OK  " if success else "ERREUR ") + message)
 
 
 if __name__ == "__main__":
