@@ -1,3 +1,7 @@
+import json
+import os
+from datetime import datetime
+
 from .analyzer import aggregate_by_ip, build_recommendations, build_summary
 from .parser import parse_log_file
 
@@ -46,3 +50,25 @@ def print_console_report(summary: dict, stats: dict, recommendations: list):
     print(f"Successful logins     : {summary['total_successful_logins']}")
     print(f"Unique IPs            : {summary['unique_ips']}")
     print(f"Suspicious IPs        : {len(summary['suspicious_ips'])}")
+
+
+def export_json(summary: dict, stats: dict, recommendations: list, output_dir: str):
+    serializable_stats = {
+        ip: {
+            "failed": d["failed"],
+            "invalid_user": d["invalid_user"],
+            "success": d["success"],
+            "users_tried": sorted(d["users_tried"]),
+        }
+        for ip, d in stats.items()
+    }
+    report = {
+        "generated_at": datetime.now().isoformat(),
+        "summary": summary,
+        "ip_details": serializable_stats,
+        "recommendations": recommendations,
+    }
+    path = os.path.join(output_dir, "report.json")
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(report, f, indent=2, ensure_ascii=False)
+    return path
