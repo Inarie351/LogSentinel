@@ -14,3 +14,16 @@ def aggregate_by_ip(events: List[SSHEvent]) -> Dict[str, Dict]:
         stats[event.ip]["users_tried"].add(event.user)
 
     return stats
+
+
+def detect_suspicious_ips(stats: Dict[str, Dict], threshold: int = 10) -> List[str]:
+    suspicious = []
+    for ip, data in stats.items():
+        total_failed = data["failed"] + data["invalid_user"]
+        if total_failed >= threshold:
+            suspicious.append(ip)
+
+    suspicious.sort(
+        key=lambda ip: stats[ip]["failed"] + stats[ip]["invalid_user"], reverse=True
+    )
+    return suspicious
