@@ -72,3 +72,46 @@ def export_json(summary: dict, stats: dict, recommendations: list, output_dir: s
     with open(path, "w", encoding="utf-8") as f:
         json.dump(report, f, indent=2, ensure_ascii=False)
     return path
+
+
+def export_markdown(summary: dict, stats: dict, recommendations: list, output_dir: str):
+    lines = [
+        "# LogSentinel — Rapport d'analyse SSH",
+        "",
+        f"*Généré le {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}*",
+        "",
+        "## Résumé",
+        "",
+        f"- Événements analysés : **{summary['total_events']}**",
+        f"- Tentatives échouées : **{summary['total_failed_attempts']}**",
+        f"- Connexions réussies : **{summary['total_successful_logins']}**",
+        f"- IPs uniques : **{summary['unique_ips']}**",
+        f"- IPs suspectes (seuil={summary['threshold_used']}) : **{len(summary['suspicious_ips'])}**",
+        "",
+        "## Détail par IP",
+        "",
+        "| IP | Échecs | Utilisateurs tentés | Statut |",
+        "|---|---|---|---|",
+    ]
+
+    sorted_ips = sorted(
+        stats.items(),
+        key=lambda kv: kv[1]["failed"] + kv[1]["invalid_user"],
+        reverse=True,
+    )
+    for ip, data in sorted_ips:
+        total_failed = data["failed"] + data["invalid_user"]
+        if total_failed == 0:
+            continue
+        users = ", ".join(sorted(data["users_tried"])[:5])
+        status = "SUSPECT" if ip in summary["suspicious_ips"] else "OK"
+        lines.append(f"| {ip} | {total_failed} | {users} | {status} |")
+
+    lines += ["", "## Recommandations", ""]
+    for rec in recommendations:
+        lines.append(f"- {rec}")
+
+    path = os.path.join(output_dir, "report.md")
+    with open(path, "w", encoding="utf-8") as f:
+        f.write("\n".join(lines))
+    return path
