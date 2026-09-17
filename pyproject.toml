@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "logsentinel"
+version = "1.0.0"
+description = "Analyseur de logs SSH — détection de tentatives de connexion suspectes (brute-force) et génération de rapports."
+readme = "README.md"
+requires-python = ">=3.8"
+license = { text = "MIT" }
+
+[project.scripts]
+logsentinel = "logsentinel.cli:main"
+
+[tool.setuptools]
+packages = ["logsentinel"]
