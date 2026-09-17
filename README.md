@@ -102,6 +102,16 @@ log-sentinel/
 3. **Détection** — toute IP dépassant le seuil d'échecs (par défaut 10) est marquée `SUSPICIOUS`
 4. **Recommandation** — le rapport final propose des actions concrètes, à valider et appliquer manuellement
 
+## Stack technique
+
+- Python 3 (stdlib uniquement : `re`, `collections`, `argparse`, `json`, `dataclasses`)
+- Aucune dépendance externe → portable et facile à auditer
+
+## Limites connues
+
+- Le format de log supporté est le format syslog classique de `sshd` (Debian/Ubuntu). D'autres formats (journald brut, RHEL) nécessiteraient d'adapter les regex du `parser.py`.
+- La géolocalisation des IPs n'est pas incluse (piste d'amélioration future avec `geoip2`).
+
 ## Licence
 
 MIT
