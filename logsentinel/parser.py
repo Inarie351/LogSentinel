@@ -1,6 +1,6 @@
 import re
 from dataclasses import dataclass
-from typing import Optional
+from typing import List, Optional
 
 
 @dataclass
@@ -49,3 +49,13 @@ def parse_line(line: str) -> Optional[SSHEvent]:
                 port=data.get("port"),
             )
     return None
+
+
+def parse_log_file(filepath: str) -> List[SSHEvent]:
+    events: List[SSHEvent] = []
+    with open(filepath, "r", encoding="utf-8", errors="ignore") as f:
+        for line in f:
+            event = parse_line(line.strip())
+            if event:
+                events.append(event)
+    return events
