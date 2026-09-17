@@ -54,3 +54,25 @@ def build_summary(events: List[SSHEvent], stats: Dict[str, Dict], threshold: int
         "last_event": timestamps[-1] if timestamps else None,
         "threshold_used": threshold,
     }
+
+
+def build_recommendations(summary: Dict, stats: Dict[str, Dict]) -> List[str]:
+    recs = []
+
+    if summary["suspicious_ips"]:
+        for ip in summary["suspicious_ips"][:5]:
+            attempts = stats[ip]["failed"] + stats[ip]["invalid_user"]
+            recs.append(
+                f"Considérer le blocage de {ip} ({attempts} tentatives échouées)"
+            )
+        recs.append("Envisager l'installation de fail2ban pour un blocage automatique")
+        recs.append("Vérifier si l'authentification par mot de passe peut être désactivée (clés SSH uniquement)")
+    else:
+        recs.append("Aucune activité suspecte détectée avec le seuil actuel")
+
+    if summary["total_failed_attempts"] > 0 and summary["unique_ips"] > 0:
+        avg = summary["total_failed_attempts"] / summary["unique_ips"]
+        if avg > 5:
+            recs.append("Le nombre moyen d'échecs par IP est élevé : envisager de changer le port SSH par défaut")
+
+    return recs
