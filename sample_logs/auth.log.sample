@@ -1,0 +1,27 @@
+Jan 17 10:20:01 server sshd[1201]: Accepted publickey for kimberly from 192.168.1.5 port 51290 ssh2
+Jan 17 10:22:11 server sshd[1350]: Failed password for root from 185.220.101.45 port 51234 ssh2
+Jan 17 10:22:12 server sshd[1351]: Failed password for root from 185.220.101.45 port 51235 ssh2
+Jan 17 10:22:14 server sshd[1352]: Failed password for invalid user admin from 185.220.101.45 port 51236 ssh2
+Jan 17 10:22:15 server sshd[1353]: Failed password for invalid user test from 185.220.101.45 port 51237 ssh2
+Jan 17 10:22:17 server sshd[1354]: Failed password for root from 185.220.101.45 port 51238 ssh2
+Jan 17 10:22:19 server sshd[1355]: Failed password for invalid user oracle from 185.220.101.45 port 51239 ssh2
+Jan 17 10:22:21 server sshd[1356]: Failed password for invalid user postgres from 185.220.101.45 port 51240 ssh2
+Jan 17 10:22:23 server sshd[1357]: Failed password for root from 185.220.101.45 port 51241 ssh2
+Jan 17 10:22:25 server sshd[1358]: Failed password for invalid user ubuntu from 185.220.101.45 port 51242 ssh2
+Jan 17 10:22:27 server sshd[1359]: Failed password for invalid user deploy from 185.220.101.45 port 51243 ssh2
+Jan 17 10:22:29 server sshd[1360]: Failed password for root from 185.220.101.45 port 51244 ssh2
+Jan 17 10:22:31 server sshd[1361]: Failed password for invalid user git from 185.220.101.45 port 51245 ssh2
+Jan 17 10:22:33 server sshd[1362]: Failed password for invalid user backup from 185.220.101.45 port 51246 ssh2
+Jan 17 10:22:35 server sshd[1363]: Failed password for root from 185.220.101.45 port 51247 ssh2
+Jan 17 10:22:37 server sshd[1364]: Failed password for invalid user pi from 185.220.101.45 port 51248 ssh2
+Jan 17 10:22:39 server sshd[1365]: Failed password for invalid user user from 185.220.101.45 port 51249 ssh2
+Jan 17 10:22:41 server sshd[1366]: Failed password for root from 185.220.101.45 port 51250 ssh2
+Jan 17 10:22:43 server sshd[1367]: Failed password for invalid user ftp from 185.220.101.45 port 51251 ssh2
+Jan 17 10:22:45 server sshd[1368]: Failed password for invalid user vagrant from 185.220.101.45 port 51252 ssh2
+Jan 17 10:30:02 server sshd[1400]: Failed password for admin from 10.0.0.12 port 44210 ssh2
+Jan 17 10:30:05 server sshd[1401]: Failed password for admin from 10.0.0.12 port 44211 ssh2
+Jan 17 10:30:08 server sshd[1402]: Failed password for admin from 10.0.0.12 port 44212 ssh2
+Jan 17 10:45:00 server sshd[1500]: Accepted password for kimberly from 192.168.1.5 port 51300 ssh2
+Jan 17 11:02:15 server sshd[1601]: Failed password for root from 45.155.204.19 port 60123 ssh2
+Jan 17 11:02:16 server sshd[1602]: Failed password for invalid user support from 45.155.204.19 port 60124 ssh2
+Jan 17 11:15:44 server sshd[1700]: Accepted publickey for kimberly from 192.168.1.5 port 51340 ssh2
