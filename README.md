@@ -27,6 +27,16 @@ Par défaut, l'outil se contente d'analyser et de recommander sans toucher au sy
 ```bash
 git clone https://github.com/<ton-username>/log-sentinel.git
 cd log-sentinel
+pipx install -e .
+```
+
+`pipx` crée un environnement isolé et rend la commande `logsentinel` disponible globalement, sans toucher au Python système. C'est la méthode recommandée, notamment sur les distributions récentes (Debian/Ubuntu) où `pip install` refuse d'installer hors virtualenv (erreur *externally-managed-environment*).
+
+Alternative avec un virtualenv classique :
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
 pip install -e .
 ```
 
