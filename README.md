@@ -10,7 +10,7 @@ Analyseur de logs d'authentification SSH — détection de tentatives de connexi
 
 LogSentinel parse les fichiers `auth.log` (format syslog standard sur Debian/Ubuntu) pour identifier les IPs qui multiplient les tentatives de connexion échouées — un signe classique d'attaque par brute-force sur SSH.
 
-L'outil analyse et recommande, sans jamais toucher au système de lui-même.
+Par défaut, l'outil se contente d'analyser et de recommander sans toucher au système. Le flag optionnel `--block` permet, si vous le souhaitez explicitement, de bloquer une ou plusieurs IPs via `iptables` — cette action reste manuelle et nécessite les privilèges root.
 
 ## Fonctionnalités
 
@@ -19,6 +19,8 @@ L'outil analyse et recommande, sans jamais toucher au système de lui-même.
 - Détection des IPs suspectes selon un seuil configurable
 - Recommandations textuelles (blocage, fail2ban, désactivation de l'auth par mot de passe...)
 - Export du rapport en **JSON** (exploitable par un autre outil) et **Markdown** (lisible, versionnable)
+- Blocage optionnel d'IPs via `iptables` avec le flag `--block`
+- Aide intégrée via `-h` / `--help`
 
 ## Installation
 
@@ -78,7 +80,25 @@ logsentinel /var/log/auth.log --json --markdown
 
 # Choisir le dossier de sortie des rapports
 logsentinel /var/log/auth.log --json --output-dir ./reports
+
+# Bloquer une ou plusieurs IPs via iptables (nécessite root)
+sudo logsentinel /var/log/auth.log --block 185.220.101.45 45.155.204.19
+
+# Afficher l'aide
+logsentinel --help
 ```
+
+### Blocage d'IPs (`--block`)
+
+Le flag `--block` accepte une ou plusieurs IPs et exécute, pour chacune, la commande équivalente à :
+
+```bash
+iptables -A INPUT -s <ip> -j DROP
+```
+
+- Nécessite les privilèges root et la présence d'`iptables` sur le système.
+- Chaque IP est validée avant tout appel système ; une IP invalide est signalée sans exécuter de commande.
+- Le résultat (succès ou erreur) est affiché pour chaque IP traitée.
 
 ## Structure du projet
 
@@ -88,7 +108,8 @@ log-sentinel/
 │   ├── __init__.py
 │   ├── cli.py           # Point d'entrée CLI
 │   ├── parser.py        # Extraction des événements depuis les logs
-│   └── analyzer.py      # Agrégation, détection, recommandations
+│   ├── analyzer.py      # Agrégation, détection, recommandations
+│   └── blocker.py       # Blocage d'IPs via iptables
 ├── sample_logs/
 │   └── auth.log.sample  # Log d'exemple pour tester sans serveur
 ├── pyproject.toml
@@ -111,6 +132,7 @@ log-sentinel/
 
 - Le format de log supporté est le format syslog classique de `sshd` (Debian/Ubuntu). D'autres formats (journald brut, RHEL) nécessiteraient d'adapter les regex du `parser.py`.
 - La géolocalisation des IPs n'est pas incluse (piste d'amélioration future avec `geoip2`).
+- Le blocage (`--block`) repose sur `iptables` : il ne fonctionne que sur les systèmes où cet outil est disponible, et les règles ajoutées ne sont pas persistées après redémarrage sans outil complémentaire (`iptables-persistent`, `netfilter-persistent`...).
 
 ## Licence
 
