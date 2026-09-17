@@ -1,5 +1,7 @@
+import argparse
 import json
 import os
+import sys
 from datetime import datetime
 
 from .analyzer import aggregate_by_ip, build_recommendations, build_summary
@@ -115,3 +117,46 @@ def export_markdown(summary: dict, stats: dict, recommendations: list, output_di
     with open(path, "w", encoding="utf-8") as f:
         f.write("\n".join(lines))
     return path
+
+
+def main():
+    parser_args = argparse.ArgumentParser(
+        description="LogSentinel — Analyseur de logs SSH (détection de brute-force)"
+    )
+    parser_args.add_argument("logfile", help="Chemin vers le fichier auth.log à analyser")
+    parser_args.add_argument(
+        "--threshold",
+        type=int,
+        default=10,
+        help="Nombre d'échecs à partir duquel une IP est considérée suspecte (défaut: 10)",
+    )
+    parser_args.add_argument("--json", action="store_true", help="Exporte le rapport en JSON")
+    parser_args.add_argument("--markdown", action="store_true", help="Exporte le rapport en Markdown")
+    parser_args.add_argument(
+        "--output-dir", default=".", help="Dossier de sortie pour les rapports (défaut: dossier courant)"
+    )
+
+    args = parser_args.parse_args()
+
+    if not os.path.isfile(args.logfile):
+        print(f"Erreur: fichier introuvable : {args.logfile}", file=sys.stderr)
+        sys.exit(1)
+
+    events = parse_log_file(args.logfile)
+    stats = aggregate_by_ip(events)
+    summary = build_summary(events, stats, args.threshold)
+    recommendations = build_recommendations(summary, stats)
+
+    print_console_report(summary, stats, recommendations)
+
+    if args.json:
+        path = export_json(summary, stats, recommendations, args.output_dir)
+        print(f"\nRapport JSON généré : {path}")
+
+    if args.markdown:
+        path = export_markdown(summary, stats, recommendations, args.output_dir)
+        print(f"Rapport Markdown généré : {path}")
+
+
+if __name__ == "__main__":
+    main()
