@@ -80,6 +80,28 @@ logsentinel /var/log/auth.log --json --markdown
 logsentinel /var/log/auth.log --json --output-dir ./reports
 ```
 
+## Structure du projet
+
+```
+log-sentinel/
+├── logsentinel/
+│   ├── __init__.py
+│   ├── cli.py           # Point d'entrée CLI
+│   ├── parser.py        # Extraction des événements depuis les logs
+│   └── analyzer.py      # Agrégation, détection, recommandations
+├── sample_logs/
+│   └── auth.log.sample  # Log d'exemple pour tester sans serveur
+├── pyproject.toml
+└── README.md
+```
+
+## Comment fonctionne la détection
+
+1. **Parsing** — chaque ligne du log est testée contre des regex ciblant les messages `sshd` (`Failed password`, `Accepted password/publickey`, utilisateurs invalides)
+2. **Agrégation** — les événements sont regroupés par IP source, avec le décompte des échecs et la liste des noms d'utilisateurs tentés
+3. **Détection** — toute IP dépassant le seuil d'échecs (par défaut 10) est marquée `SUSPICIOUS`
+4. **Recommandation** — le rapport final propose des actions concrètes, à valider et appliquer manuellement
+
 ## Licence
 
 MIT
