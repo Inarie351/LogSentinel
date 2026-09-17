@@ -33,7 +33,7 @@ Par défaut, l'outil se contente d'analyser et de recommander sans toucher au sy
 ## Installation
 
 ```bash
-git clone https://github.com/<ton-username>/log-sentinel.git
+git clone https://github.com/Inarie351/LogSentinel.git
 cd log-sentinel
 pipx install -e .
 ```
