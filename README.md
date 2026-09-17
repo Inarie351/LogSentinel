@@ -20,6 +20,16 @@ L'outil analyse et recommande, sans jamais toucher au système de lui-même.
 - Recommandations textuelles (blocage, fail2ban, désactivation de l'auth par mot de passe...)
 - Export du rapport en **JSON** (exploitable par un autre outil) et **Markdown** (lisible, versionnable)
 
+## Installation
+
+```bash
+git clone https://github.com/<ton-username>/log-sentinel.git
+cd log-sentinel
+pip install -e .
+```
+
+Aucune dépendance externe : uniquement la bibliothèque standard Python 3.8+.
+
 ## Licence
 
 MIT
