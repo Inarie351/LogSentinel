@@ -30,6 +30,56 @@ pip install -e .
 
 Aucune dépendance externe : uniquement la bibliothèque standard Python 3.8+.
 
+## Utilisation
+
+### Analyse simple (log d'exemple fourni)
+
+```bash
+logsentinel sample_logs/auth.log.sample
+```
+
+Sortie :
+
+```
+LOGSENTINEL
+────────────────────────────────────────
+
+SSH LOGIN ANALYSIS
+────────────────────────────────────────
+185.220.101.45      19 failed attempts  ⚠ SUSPICIOUS
+10.0.0.12           3 failed attempts
+45.155.204.19       2 failed attempts
+
+Top attacking IP
+────────────────────────────────────────
+185.220.101.45
+
+Recommendation
+────────────────────────────────────────
+→ Considérer le blocage de 185.220.101.45 (19 tentatives échouées)
+→ Envisager l'installation de fail2ban pour un blocage automatique
+→ Vérifier si l'authentification par mot de passe peut être désactivée (clés SSH uniquement)
+```
+
+### Sur un vrai serveur
+
+```bash
+logsentinel /var/log/auth.log
+```
+
+### Options avancées
+
+```bash
+# Changer le seuil de détection (défaut: 10 échecs)
+logsentinel /var/log/auth.log --threshold 15
+
+# Générer les rapports JSON et Markdown
+logsentinel /var/log/auth.log --json --markdown
+
+# Choisir le dossier de sortie des rapports
+logsentinel /var/log/auth.log --json --output-dir ./reports
+```
+
 ## Licence
 
 MIT
