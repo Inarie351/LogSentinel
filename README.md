@@ -6,6 +6,14 @@ Analyseur de logs d'authentification SSH — détection de tentatives de connexi
 ![License](https://img.shields.io/badge/License-MIT-green)
 ![Status](https://img.shields.io/badge/Status-Stable-brightgreen)
 
+## Origine du projet
+
+L'idée de LogSentinel est née de l'utilisation de **Wazuh** lors d'un de mes stages.
+
+Wazuh est une plateforme open source de sécurité (SIEM / XDR) qui centralise la collecte des logs d'un parc de machines, détecte les intrusions, analyse les vulnérabilités et aide à la réponse à incident. Concrètement, il surveille en continu les événements système — dont les tentatives de connexion SSH — les corrèle avec des règles de détection, et déclenche des alertes (voire des actions automatiques via son module *Active Response*) lorsqu'un comportement suspect est identifié, typiquement du brute-force sur un service exposé.
+
+En observant comment Wazuh traitait ce genre d'alertes, j'ai voulu comprendre et reproduire, à plus petite échelle, la mécanique de base : parser des logs d'authentification, agréger les tentatives par IP, détecter les seuils suspects et proposer une remédiation. LogSentinel est une version simplifiée et pédagogique de cette logique, pensée pour être lisible, auditable et facile à étendre.
+
 ## Description
 
 LogSentinel parse les fichiers `auth.log` (format syslog standard sur Debian/Ubuntu) pour identifier les IPs qui multiplient les tentatives de connexion échouées — un signe classique d'attaque par brute-force sur SSH.
