@@ -211,6 +211,20 @@ log-sentinel/
 - Aucune dépendance externe pour le cœur de l'outil → portable et facile à auditer
 - `IncidentBot` (optionnel, extra `[ai]`) : SDK `anthropic` + `pydantic` pour les *structured outputs*
 
+## Lancer les tests
+
+```bash
+# Tests du cœur de l'outil (parser, analyzer, blocker, cli)
+pip install -e ".[test]"
+pytest
+
+# Pour inclure les tests d'IncidentBot (nécessite l'extra [ai])
+pip install -e ".[ai,test]"
+pytest
+```
+
+Les tests d'`IncidentBot` mockent l'API Anthropic (aucune clé API ni appel réseau n'est nécessaire) ; ils sont automatiquement ignorés si l'extra `[ai]` n'est pas installé.
+
 ## Limites connues
 
 - Le format de log supporté est le format syslog classique de `sshd` (Debian/Ubuntu). D'autres formats (journald brut, RHEL) nécessiteraient d'adapter les regex du `parser.py`.
