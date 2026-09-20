@@ -10,8 +10,12 @@ readme = "README.md"
 requires-python = ">=3.8"
 license = { text = "MIT" }
 
+[project.optional-dependencies]
+ai = ["anthropic>=0.40.0", "pydantic>=2.0"]
+
 [project.scripts]
 logsentinel = "logsentinel.cli:main"
+logsentinel-incidentbot = "logsentinel.incidentbot:main"
 
 [tool.setuptools]
 packages = ["logsentinel"]

@@ -1,6 +1,6 @@
-# LogSentinel
+# LogSentinel & IncidentBot
 
-Analyseur de logs d'authentification SSH — détection de tentatives de connexion suspectes (brute-force) et génération de rapports.
+Analyseur de logs d'authentification SSH — détection de tentatives de connexion suspectes (brute-force) et génération de rapports — complété par `IncidentBot`, qui transforme ces rapports en résumés d'incident rédigés par IA.
 
 ![Python](https://img.shields.io/badge/Python-3.8+-blue?logo=python&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-green)
@@ -28,6 +28,7 @@ Par défaut, l'outil se contente d'analyser et de recommander sans toucher au sy
 - Recommandations textuelles (blocage, fail2ban, désactivation de l'auth par mot de passe...)
 - Export du rapport en **JSON** (exploitable par un autre outil) et **Markdown** (lisible, versionnable)
 - Blocage optionnel d'IPs via `iptables` avec le flag `--block`
+- `IncidentBot` (optionnel) : résumé d'incident en langage naturel généré par Claude à partir du rapport JSON
 - Aide intégrée via `-h` / `--help`
 
 ## Installation
@@ -118,6 +119,68 @@ iptables -A INPUT -s <ip> -j DROP
 - Chaque IP est validée avant tout appel système ; une IP invalide est signalée sans exécuter de commande.
 - Le résultat (succès ou erreur) est affiché pour chaque IP traitée.
 
+## IncidentBot — résumé d'incident généré par IA
+
+`IncidentBot` prend le `report.json` déjà généré par LogSentinel et demande à Claude (via l'API Anthropic) de rédiger un résumé d'incident en langage naturel, avec une gravité globale et un plan d'action priorisé — comme le ferait un analyste sécurité junior rédigeant son rapport.
+
+La sortie du modèle est contrainte à un schéma structuré (`severity`, `summary`, `priority_actions`) via les *structured outputs* de l'API, puis rendue en Markdown.
+
+### Installation
+
+```bash
+pipx install -e ".[ai]"
+```
+
+### Configuration
+
+Définissez une clé API Anthropic :
+
+```bash
+export ANTHROPIC_API_KEY=sk-ant-...
+```
+
+### Utilisation
+
+```bash
+# Génère d'abord le rapport JSON
+logsentinel /var/log/auth.log --json
+
+# Puis demande à Claude de le résumer
+logsentinel-incidentbot report.json
+```
+
+Sortie :
+
+```
+# Rapport d'incident — Généré par IA
+
+**Gravité globale : ÉLEVÉE**
+
+## Résumé
+
+Une attaque par force brute soutenue a été détectée depuis
+185.220.101.45, ciblant principalement des comptes système
+génériques (root, admin). Le volume et la diversité des
+utilisateurs testés suggèrent un scan automatisé plutôt
+qu'une tentative ciblée.
+
+## Actions prioritaires
+
+1. Bloquer immédiatement 185.220.101.45
+2. Vérifier l'absence de connexion réussie depuis cette IP
+3. Envisager fail2ban pour prévenir la récurrence
+```
+
+Options :
+
+```bash
+# Choisir un autre modèle (par défaut : claude-opus-5)
+logsentinel-incidentbot report.json --model claude-sonnet-5
+
+# Écrire le rapport dans un fichier plutôt que sur stdout
+logsentinel-incidentbot report.json --output incident_report.md
+```
+
 ## Structure du projet
 
 ```
@@ -127,7 +190,8 @@ log-sentinel/
 │   ├── cli.py           # Point d'entrée CLI
 │   ├── parser.py        # Extraction des événements depuis les logs
 │   ├── analyzer.py      # Agrégation, détection, recommandations
-│   └── blocker.py       # Blocage d'IPs via iptables
+│   ├── blocker.py       # Blocage d'IPs via iptables
+│   └── incidentbot.py   # Résumé d'incident généré par IA (Claude)
 ├── sample_logs/
 │   └── auth.log.sample  # Log d'exemple pour tester sans serveur
 ├── pyproject.toml
@@ -144,12 +208,14 @@ log-sentinel/
 ## Stack technique
 
 - Python 3 (stdlib uniquement : `re`, `collections`, `argparse`, `json`, `dataclasses`)
-- Aucune dépendance externe → portable et facile à auditer
+- Aucune dépendance externe pour le cœur de l'outil → portable et facile à auditer
+- `IncidentBot` (optionnel, extra `[ai]`) : SDK `anthropic` + `pydantic` pour les *structured outputs*
 
 ## Limites connues
 
 - Le format de log supporté est le format syslog classique de `sshd` (Debian/Ubuntu). D'autres formats (journald brut, RHEL) nécessiteraient d'adapter les regex du `parser.py`.
 - La géolocalisation des IPs n'est pas incluse (piste d'amélioration future avec `geoip2`).
+- `IncidentBot` nécessite une clé API Anthropic valide et un accès réseau ; chaque appel a un coût (faible pour ce volume de données).
 - Le blocage (`--block`) repose sur `iptables` : il ne fonctionne que sur les systèmes où cet outil est disponible, et les règles ajoutées ne sont pas persistées après redémarrage sans outil complémentaire (`iptables-persistent`, `netfilter-persistent`...).
 
 ## Licence
